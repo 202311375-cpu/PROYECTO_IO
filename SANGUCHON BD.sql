@@ -1,6 +1,9 @@
 -------------------------------------------------------------------
 -- SANGUCHON BD
 -------------------------------------------------------------------
+CREATE DATABASE SANGUCHON_BD
+USE SANGUCHON_BD
+
 
 -- Tabla PRODUCTO
 CREATE TABLE PRODUCTO (
