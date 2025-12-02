@@ -25,8 +25,8 @@ CREATE TABLE TIENDA (
 CREATE TABLE DEMANDA_MENSUAL (
     id_demanda INT PRIMARY KEY IDENTITY(1,1),
     id_tienda INT NOT NULL,
-    id_producto INT NOT NULL,
     mes INT NOT NULL, -- 1 = MES1, 2 = MES2, 3 = MES3
+    id_producto INT NOT NULL,
     cantidad_demandada INT NOT NULL,
     FOREIGN KEY (id_tienda) REFERENCES TIENDA(id_tienda),
     FOREIGN KEY (id_producto) REFERENCES PRODUCTO(id_producto)
@@ -36,8 +36,8 @@ CREATE TABLE DEMANDA_MENSUAL (
 CREATE TABLE RESULTADO_MENSUAL (
     id_resultado INT PRIMARY KEY IDENTITY(1,1),
     id_tienda INT NOT NULL,
+	mes INT NOT NULL,
     id_producto INT NOT NULL,
-    mes INT NOT NULL,
     cantidad_entregada INT NOT NULL,
     FOREIGN KEY (id_tienda) REFERENCES TIENDA(id_tienda),
     FOREIGN KEY (id_producto) REFERENCES PRODUCTO(id_producto)
@@ -259,26 +259,25 @@ INSERT INTO PLANIFICACION_MENSUAL (mes, id_producto, id_tienda, cantidad_planifi
 --insertar datos por tabla DEMANDA MES 1 MES 2 MES 3 
 
 -- MES1
-INSERT INTO DEMANDA_MENSUAL (id_tienda, id_producto, mes, cantidad_demandada) VALUES
-(1, 1, 1, 300), (1, 2, 1, 280), (1, 3, 1, 200), (1, 4, 1, 180), (1, 5, 1, 260),
-(2, 1, 1, 280), (2, 2, 1, 260), (2, 3, 1, 190), (2, 4, 1, 160), (2, 5, 1, 240),
-(3, 1, 1, 230), (3, 2, 1, 240), (3, 3, 1, 160), (3, 4, 1, 150), (3, 5, 1, 230),
-(4, 1, 1, 240), (4, 2, 1, 230), (4, 3, 1, 180), (4, 4, 1, 140), (4, 5, 1, 220),
-(5, 1, 1, 220), (5, 2, 1, 210), (5, 3, 1, 150), (5, 4, 1, 130), (5, 5, 1, 210);
+INSERT INTO DEMANDA_MENSUAL (id_tienda, mes, id_producto, cantidad_demandada) VALUES
+(1, 1, 1, 300), (1, 1, 2, 280), (1, 1, 3, 200), (1, 1, 4, 180), (1, 1, 5, 260),
+(2, 1, 1, 280), (2, 1, 2, 260), (2, 1, 3, 190), (2, 1, 4, 160), (2, 1, 5, 240),
+(3, 1, 1, 230), (3, 1, 2, 240), (3, 1, 3, 160), (3, 1, 4, 150), (3, 1, 5, 230),
+(4, 1, 1, 240), (4, 1, 2, 230), (4, 1, 3, 180), (4, 1, 4, 140), (4, 1, 5, 220),
+(5, 1, 1, 220), (5, 1, 2, 210), (5, 1, 3, 150), (5, 1, 4, 130), (5, 1, 5, 210);
 
 -- MES2
-INSERT INTO DEMANDA_MENSUAL (id_tienda, id_producto, mes, cantidad_demandada) VALUES
-(1, 1, 2, 920), (1, 2, 2, 500), (1, 3, 2, 550), (1, 4, 2, 2800), (1, 5, 2, 350),
-(2, 1, 2, 800), (2, 2, 2, 320), (2, 3, 2, 400), (2, 4, 2, 2500), (2, 5, 2, 420),
-(3, 1, 2, 870), (3, 2, 2, 450), (3, 3, 2, 230), (3, 4, 2, 3100), (3, 5, 2, 290),
-(4, 1, 2, 830), (4, 2, 2, 230), (4, 3, 2, 230), (4, 4, 2, 3050), (4, 5, 2, 360),
-(5, 1, 2, 940), (5, 2, 2, 410), (5, 3, 2, 610), (5, 4, 2, 2950), (5, 5, 2, 310);
+INSERT INTO DEMANDA_MENSUAL (id_tienda, mes, id_producto, cantidad_demandada) VALUES
+(1, 2, 1, 920), (1, 2, 2, 500), (1, 2, 3, 550), (1, 2, 4, 2800), (1, 2, 5, 350),
+(2, 2, 1, 800), (2, 2, 2, 320), (2, 2, 3, 400), (2, 2, 4, 2500), (2, 2, 5, 420),
+(3, 2, 1, 870), (3, 2, 2, 450), (3, 2, 3, 230), (3, 2, 4, 3100), (3, 2, 5, 290),
+(4, 2, 1, 830), (4, 2, 2, 230), (4, 2, 3, 230), (4, 2, 4, 3050), (4, 2, 5, 360),
+(5, 2, 1, 940), (5, 2, 2, 410), (5, 2, 3, 610), (5, 2, 4, 2950), (5, 2, 5, 310);
 
 -- MES3
-INSERT INTO DEMANDA_MENSUAL (id_tienda, id_producto, mes, cantidad_demandada) VALUES
-(1, 1, 3, 1100), (1, 2, 3, 1200), (1, 3, 3, 900), (1, 4, 3, 3500), (1, 5, 3, 450),
-(2, 1, 3, 950), (2, 2, 3, 600), (2, 3, 3, 500), (2, 4, 3, 3200), (2, 5, 3, 400),
-(3, 1, 3, 9500), (3, 2, 3, 6800), (3, 3, 3, 2900), (3, 4, 3, 3800), (3, 5, 3, 4600),
-(4, 1, 3, 970), (4, 2, 3, 490), (4, 3, 3, 420), (4, 4, 3, 3900), (4, 5, 3, 400),
-(5, 1, 3, 520), (5, 2, 3, 650), (5, 3, 3, 780), (5, 4, 3, 1150), (5, 5, 3, 470);
-
+INSERT INTO DEMANDA_MENSUAL (id_tienda, mes, id_producto, cantidad_demandada) VALUES
+(1, 3, 1, 1100), (1, 3, 2, 1200), (1, 3, 3, 900), (1, 3, 4, 3500), (1, 3, 5, 450),
+(2, 3, 1, 950), (2, 3, 2, 600), (2, 3, 3, 500), (2, 3, 4, 3200), (2, 3, 5, 400),
+(3, 3, 1, 9500), (3, 3, 2, 6800), (3, 3, 3, 2900), (3, 3, 4, 3800), (3, 3, 5, 4600),
+(4, 3, 1, 970), (4, 3, 2, 490), (4, 3, 3, 420), (4, 3, 4, 3900), (4, 3, 5, 400),
+(5, 3, 1, 520), (5, 3, 2, 650), (5, 3, 3, 780), (5, 3, 4, 1150), (5, 3, 5, 470);
