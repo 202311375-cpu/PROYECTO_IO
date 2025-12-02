@@ -260,7 +260,7 @@ INSERT INTO PLANIFICACION_MENSUAL (mes, id_producto, id_tienda, cantidad_planifi
 --insertar datos por tabla DEMANDA MES 1 MES 2 MES 3 
 
 -- MES1
-INSERT INTO RESULTADO_MENSUAL (id_tienda, id_producto, mes, cantidad_entregada) VALUES
+INSERT INTO DEMANDA_MENSUAL (id_tienda, id_producto, mes, cantidad_entregada) VALUES
 (1, 1, 1, 300), (1, 2, 1, 280), (1, 3, 1, 200), (1, 4, 1, 180), (1, 5, 1, 260),
 (2, 1, 1, 280), (2, 2, 1, 260), (2, 3, 1, 190), (2, 4, 1, 160), (2, 5, 1, 240),
 (3, 1, 1, 230), (3, 2, 1, 240), (3, 3, 1, 160), (3, 4, 1, 150), (3, 5, 1, 230),
