@@ -1,1 +1,0 @@
-# Proyecto Muebleria y Hogar
