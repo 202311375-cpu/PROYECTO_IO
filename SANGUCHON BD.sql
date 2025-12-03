@@ -1,8 +1,20 @@
--------------------------------------------------------------------
--- SANGUCHON BD
--------------------------------------------------------------------
+--------------------------
+------ SANGUCHON BD ------
+--------------------------
+
 CREATE DATABASE SANGUCHON_BD
 USE SANGUCHON_BD
+
+-- Tabla DEMANDA_MENSUAL
+CREATE TABLE DEMANDA_MENSUAL (
+    id_demanda INT PRIMARY KEY IDENTITY(1,1),
+    id_tienda INT NOT NULL,
+    mes INT NOT NULL, -- 1 = MES1, 2 = MES2, 3 = MES3
+    id_producto INT NOT NULL,
+    cantidad_demandada INT NOT NULL,
+    FOREIGN KEY (id_tienda) REFERENCES TIENDA(id_tienda),
+    FOREIGN KEY (id_producto) REFERENCES PRODUCTO(id_producto)
+);
 
 -- Tabla PRODUCTO
 CREATE TABLE PRODUCTO (
@@ -21,15 +33,15 @@ CREATE TABLE TIENDA (
     area_despensa INT NOT NULL
 );
 
--- Tabla DEMANDA_MENSUAL
-CREATE TABLE DEMANDA_MENSUAL (
-    id_demanda INT PRIMARY KEY IDENTITY(1,1),
-    id_tienda INT NOT NULL,
+--Tabla PLANIFICACION_MENSUAL
+CREATE TABLE PLANIFICACION_MENSUAL (
+    id_planificacion INT PRIMARY KEY IDENTITY(1,1),
     mes INT NOT NULL, -- 1 = MES1, 2 = MES2, 3 = MES3
     id_producto INT NOT NULL,
-    cantidad_demandada INT NOT NULL,
-    FOREIGN KEY (id_tienda) REFERENCES TIENDA(id_tienda),
-    FOREIGN KEY (id_producto) REFERENCES PRODUCTO(id_producto)
+    id_tienda INT NOT NULL,
+    cantidad_planificada INT NOT NULL,
+    FOREIGN KEY (id_producto) REFERENCES PRODUCTO(id_producto),
+    FOREIGN KEY (id_tienda) REFERENCES TIENDA(id_tienda)
 );
 
 -- Tabla RESULTADO_MENSUAL
@@ -43,21 +55,14 @@ CREATE TABLE RESULTADO_MENSUAL (
     FOREIGN KEY (id_producto) REFERENCES PRODUCTO(id_producto)
 );
 
---Tabla PLANIFICACION_MENSUAL
-CREATE TABLE PLANIFICACION_MENSUAL (
-    id_planificacion INT PRIMARY KEY IDENTITY(1,1),
-    mes INT NOT NULL, -- 1 = MES1, 2 = MES2, 3 = MES3
-    id_producto INT NOT NULL,
-    id_tienda INT NOT NULL,
-    cantidad_planificada INT NOT NULL,
-    FOREIGN KEY (id_producto) REFERENCES PRODUCTO(id_producto),
-    FOREIGN KEY (id_tienda) REFERENCES TIENDA(id_tienda)
-);
 
+----------------------------------------
+------ PROCEDIMEINTOS ALMACENADOS ------
+----------------------------------------
 
---------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------
+---- Insertar, Actualizar y Eliminar ... ---
 
+-- Producto
 CREATE PROCEDURE sp_Producto_CRUD
     @Operacion NVARCHAR(10),
     @id_producto INT = NULL,
@@ -83,9 +88,8 @@ BEGIN
         DELETE FROM PRODUCTO WHERE id_producto = @id_producto;
 END;
 
---------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------
 
+-- Tienda
 CREATE PROCEDURE sp_Tienda_CRUD
     @Operacion NVARCHAR(10),
     @id_tienda INT = NULL,
@@ -113,9 +117,7 @@ BEGIN
         DELETE FROM TIENDA WHERE id_tienda = @id_tienda;
 END;
 
---------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------
-
+-- Demanda Mensual
 CREATE PROCEDURE sp_DemandaMensual_CRUD
     @Operacion NVARCHAR(10),
     @id_demanda INT = NULL,
@@ -143,141 +145,61 @@ BEGIN
         DELETE FROM DEMANDA_MENSUAL WHERE id_demanda = @id_demanda;
 END;
 
-
-
---------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------
-
-CREATE PROCEDURE sp_ResultadoMensual_CRUD
+-- Planificacion Mensual
+CREATE PROCEDURE sp_PlanificacionMensual_CRUD
     @Operacion NVARCHAR(10),
-    @id_resultado INT = NULL,
-    @id_tienda INT = NULL,
-    @id_producto INT = NULL,
+    @id_planificacion INT = NULL,
     @mes INT = NULL,
-    @cantidad_entregada INT = NULL
+    @id_producto INT = NULL,
+    @id_tienda INT = NULL,
+    @cantidad_planificada INT = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
 
     IF @Operacion = 'INSERT'
-        INSERT INTO RESULTADO_MENSUAL (id_tienda, id_producto, mes, cantidad_entregada)
-        VALUES (@id_tienda, @id_producto, @mes, @cantidad_entregada);
+        INSERT INTO PLANIFICACION_MENSUAL (mes, id_producto, id_tienda, cantidad_planificada)
+        VALUES (@mes, @id_producto, @id_tienda, @cantidad_planificada);
 
     ELSE IF @Operacion = 'UPDATE'
-        UPDATE RESULTADO_MENSUAL
-        SET id_tienda = @id_tienda,
+        UPDATE PLANIFICACION_MENSUAL
+        SET mes = @mes,
             id_producto = @id_producto,
-            mes = @mes,
-            cantidad_entregada = @cantidad_entregada
-        WHERE id_resultado = @id_resultado;
+            id_tienda = @id_tienda,
+            cantidad_planificada = @cantidad_planificada
+        WHERE id_planificacion = @id_planificacion;
 
     ELSE IF @Operacion = 'DELETE'
-        DELETE FROM RESULTADO_MENSUAL WHERE id_resultado = @id_resultado;
+        DELETE FROM PLANIFICACION_MENSUAL
+        WHERE id_planificacion = @id_planificacion;
 END;
 
 
+--------------------
+------ VISTAS ------
+--------------------
 
---------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------
-
---Vista de demanda mensual por tienda y producto
+-- Vista de demanda mensual por tienda y producto
 CREATE VIEW VistaDemandaMensual AS
 SELECT 
     dm.id_demanda,
     t.nombre_tienda AS tienda,
+	dm.mes,
     p.nombre_producto AS producto,
-    dm.mes,
     dm.cantidad_demandada
 FROM DEMANDA_MENSUAL dm
 INNER JOIN TIENDA t ON dm.id_tienda = t.id_tienda
 INNER JOIN PRODUCTO p ON dm.id_producto = p.id_producto;
 
 
-
---Vista de resultados mensuales por tienda y producto
+-- Vista de resultados mensuales por tienda y producto
 CREATE VIEW VistaResultadoMensual AS
 SELECT 
     rm.id_resultado,
     t.nombre_tienda AS tienda,
+	rm.mes,
     p.nombre_producto AS producto,
-    rm.mes,
     rm.cantidad_entregada
 FROM RESULTADO_MENSUAL rm
 INNER JOIN TIENDA t ON rm.id_tienda = t.id_tienda
 INNER JOIN PRODUCTO p ON rm.id_producto = p.id_producto;
-
-
-
---------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------
-
---insertar datos por tabla productos
-INSERT INTO PRODUCTO (nombre_producto, costo_unitario, max_kilogramos) VALUES
-('Pan Integral', 12.00, 4800),
-('Jamón', 18.00, 3200),
-('Lechuga', 9.00, 2500),
-('Pollo', 45.00, 2500),
-('Jugo Naranja', 15.00, 3000);
-
-
---insertar datos por tabla tienda
-INSERT INTO TIENDA (nombre_tienda, volumen, inventario_inicial, area_despensa) VALUES
-('PS1', 450, 200, 115000),
-('PS2', 650, 300, 155000),
-('PS3', 350, 180, 95000),
-('PS4', 520, 220, 80000),
-('PS5', 250, 210, 60000);
-
-
---insertar datos por tabla PLANIFICACION_MENSUAL PARA MES 1 MES 2 MES 3
-
--- MES1
-INSERT INTO PLANIFICACION_MENSUAL (mes, id_producto, id_tienda, cantidad_planificada) VALUES
-(1, 1, 1, 300), (1, 1, 2, 280), (1, 1, 3, 230), (1, 1, 4, 240), (1, 1, 5, 220),
-(1, 2, 1, 280), (1, 2, 2, 260), (1, 2, 3, 240), (1, 2, 4, 230), (1, 2, 5, 210),
-(1, 3, 1, 200), (1, 3, 2, 190), (1, 3, 3, 160), (1, 3, 4, 180), (1, 3, 5, 150),
-(1, 4, 1, 180), (1, 4, 2, 160), (1, 4, 3, 150), (1, 4, 4, 140), (1, 4, 5, 130),
-(1, 5, 1, 260), (1, 5, 2, 240), (1, 5, 3, 230), (1, 5, 4, 220), (1, 5, 5, 210);
-
--- MES2
-INSERT INTO PLANIFICACION_MENSUAL (mes, id_producto, id_tienda, cantidad_planificada) VALUES
-(2, 1, 1, 320), (2, 1, 2, 300), (2, 1, 3, 260), (2, 1, 4, 280), (2, 1, 5, 240),
-(2, 2, 1, 300), (2, 2, 2, 280), (2, 2, 3, 260), (2, 2, 4, 240), (2, 2, 5, 210),
-(2, 3, 1, 210), (2, 3, 2, 200), (2, 3, 3, 170), (2, 3, 4, 190), (2, 3, 5, 160),
-(2, 4, 1, 200), (2, 4, 2, 180), (2, 4, 3, 160), (2, 4, 4, 150), (2, 4, 5, 140),
-(2, 5, 1, 280), (2, 5, 2, 260), (2, 5, 3, 240), (2, 5, 4, 230), (2, 5, 5, 220);
-
--- MES3
-INSERT INTO PLANIFICACION_MENSUAL (mes, id_producto, id_tienda, cantidad_planificada) VALUES
-(3, 1, 1, 340), (3, 1, 2, 320), (3, 1, 3, 280), (3, 1, 4, 300), (3, 1, 5, 260),
-(3, 2, 1, 320), (3, 2, 2, 300), (3, 2, 3, 280), (3, 2, 4, 260), (3, 2, 5, 230),
-(3, 3, 1, 220), (3, 3, 2, 210), (3, 3, 3, 180), (3, 3, 4, 200), (3, 3, 5, 170),
-(3, 4, 1, 210), (3, 4, 2, 190), (3, 4, 3, 170), (3, 4, 4, 160), (3, 4, 5, 150),
-(3, 5, 1, 300), (3, 5, 2, 280), (3, 5, 3, 260), (3, 5, 4, 250), (3, 5, 5, 240);
-
-
---insertar datos por tabla DEMANDA MES 1 MES 2 MES 3 
-
--- MES1
-INSERT INTO DEMANDA_MENSUAL (id_tienda, mes, id_producto, cantidad_demandada) VALUES
-(1, 1, 1, 300), (1, 1, 2, 280), (1, 1, 3, 200), (1, 1, 4, 180), (1, 1, 5, 260),
-(2, 1, 1, 280), (2, 1, 2, 260), (2, 1, 3, 190), (2, 1, 4, 160), (2, 1, 5, 240),
-(3, 1, 1, 230), (3, 1, 2, 240), (3, 1, 3, 160), (3, 1, 4, 150), (3, 1, 5, 230),
-(4, 1, 1, 240), (4, 1, 2, 230), (4, 1, 3, 180), (4, 1, 4, 140), (4, 1, 5, 220),
-(5, 1, 1, 220), (5, 1, 2, 210), (5, 1, 3, 150), (5, 1, 4, 130), (5, 1, 5, 210);
-
--- MES2
-INSERT INTO DEMANDA_MENSUAL (id_tienda, mes, id_producto, cantidad_demandada) VALUES
-(1, 2, 1, 920), (1, 2, 2, 500), (1, 2, 3, 550), (1, 2, 4, 2800), (1, 2, 5, 350),
-(2, 2, 1, 800), (2, 2, 2, 320), (2, 2, 3, 400), (2, 2, 4, 2500), (2, 2, 5, 420),
-(3, 2, 1, 870), (3, 2, 2, 450), (3, 2, 3, 230), (3, 2, 4, 3100), (3, 2, 5, 290),
-(4, 2, 1, 830), (4, 2, 2, 230), (4, 2, 3, 230), (4, 2, 4, 3050), (4, 2, 5, 360),
-(5, 2, 1, 940), (5, 2, 2, 410), (5, 2, 3, 610), (5, 2, 4, 2950), (5, 2, 5, 310);
-
--- MES3
-INSERT INTO DEMANDA_MENSUAL (id_tienda, mes, id_producto, cantidad_demandada) VALUES
-(1, 3, 1, 1100), (1, 3, 2, 1200), (1, 3, 3, 900), (1, 3, 4, 3500), (1, 3, 5, 450),
-(2, 3, 1, 950), (2, 3, 2, 600), (2, 3, 3, 500), (2, 3, 4, 3200), (2, 3, 5, 400),
-(3, 3, 1, 9500), (3, 3, 2, 6800), (3, 3, 3, 2900), (3, 3, 4, 3800), (3, 3, 5, 4600),
-(4, 3, 1, 970), (4, 3, 2, 490), (4, 3, 3, 420), (4, 3, 4, 3900), (4, 3, 5, 400),
-(5, 3, 1, 520), (5, 3, 2, 650), (5, 3, 3, 780), (5, 3, 4, 1150), (5, 3, 5, 470);
