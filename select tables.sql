@@ -7,4 +7,5 @@ select * from RESULTADO_MENSUAL
 
 --- Vistas ---
 select * from VistaDemandaMensual
+select * from VistaPlanificacionMensual
 select * from VistaResultadoMensual

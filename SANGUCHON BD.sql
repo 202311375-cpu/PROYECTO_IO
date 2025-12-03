@@ -191,6 +191,17 @@ FROM DEMANDA_MENSUAL dm
 INNER JOIN TIENDA t ON dm.id_tienda = t.id_tienda
 INNER JOIN PRODUCTO p ON dm.id_producto = p.id_producto;
 
+-- Vista de planificacion mensual por tienda y producto
+CREATE VIEW VistaPlanificacionMensual AS
+SELECT
+    pm.id_planificacion,
+    t.nombre_tienda AS tienda,
+    pm.mes,
+    p.nombre_producto AS producto,
+    pm.cantidad_planificada
+FROM PLANIFICACION_MENSUAL pm
+INNER JOIN TIENDA t ON pm.id_tienda = t.id_tienda
+INNER JOIN PRODUCTO p ON pm.id_producto = p.id_producto;
 
 -- Vista de resultados mensuales por tienda y producto
 CREATE VIEW VistaResultadoMensual AS
